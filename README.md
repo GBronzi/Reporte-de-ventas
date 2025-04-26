@@ -1,6 +1,6 @@
-# Sistema de Objetivos - Versión Portátil 2.0.0
+# Reporte de Ventas - Sistema de Objetivos 2.0.0
 
-Sistema para el seguimiento de objetivos mensuales, unidades y créditos. Esta versión ha sido configurada para funcionar de forma completamente portátil, sin necesidad de instalaciones adicionales ni dependencias externas.
+Sistema para el seguimiento y reporte de ventas, objetivos mensuales, unidades y créditos. Esta versión ha sido configurada para funcionar de forma completamente portátil, sin necesidad de instalaciones adicionales ni dependencias externas.
 
 ## Características
 
