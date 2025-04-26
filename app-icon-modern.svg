@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <!-- Gradientes principales -->
+    <linearGradient id="backgroundGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6c5ce7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a29bfe;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Gradiente para elementos de datos -->
+    <linearGradient id="dataGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00cec9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#81ecec;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Gradiente para elementos de crecimiento -->
+    <linearGradient id="growthGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ff7675;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fab1a0;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Filtros para efectos -->
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#000" flood-opacity="0.2" />
+    </filter>
+    
+    <!-- Máscara para recortar elementos -->
+    <clipPath id="circleClip">
+      <circle cx="256" cy="256" r="220" />
+    </clipPath>
+  </defs>
+  
+  <!-- Fondo circular con borde suave -->
+  <circle cx="256" cy="256" r="220" fill="url(#backgroundGradient)" filter="url(#softShadow)" />
+  
+  <!-- Elementos abstractos de fondo -->
+  <g clip-path="url(#circleClip)">
+    <!-- Formas geométricas abstractas -->
+    <circle cx="150" cy="150" r="100" fill="#ffffff" fill-opacity="0.05" />
+    <circle cx="350" cy="350" r="120" fill="#ffffff" fill-opacity="0.05" />
+    
+    <!-- Líneas de cuadrícula abstractas -->
+    <path d="M 50,256 L 462,256" stroke="#ffffff" stroke-width="1" stroke-opacity="0.1" />
+    <path d="M 256,50 L 256,462" stroke="#ffffff" stroke-width="1" stroke-opacity="0.1" />
+    
+    <!-- Círculos concéntricos -->
+    <circle cx="256" cy="256" r="180" fill="none" stroke="#ffffff" stroke-width="1" stroke-opacity="0.1" />
+    <circle cx="256" cy="256" r="140" fill="none" stroke="#ffffff" stroke-width="1" stroke-opacity="0.1" />
+    <circle cx="256" cy="256" r="100" fill="none" stroke="#ffffff" stroke-width="1" stroke-opacity="0.1" />
+  </g>
+  
+  <!-- Elemento central: Visualización de datos abstracta -->
+  <g transform="translate(256, 256)">
+    <!-- Elemento circular central -->
+    <circle cx="0" cy="0" r="80" fill="none" stroke="url(#dataGradient)" stroke-width="12" stroke-dasharray="25 8" />
+    
+    <!-- Líneas de datos radiales -->
+    <g>
+      <path d="M -60,0 L -120,0" stroke="url(#dataGradient)" stroke-width="8" stroke-linecap="round" />
+      <path d="M 60,0 L 120,0" stroke="url(#dataGradient)" stroke-width="8" stroke-linecap="round" />
+      <path d="M 0,-60 L 0,-120" stroke="url(#dataGradient)" stroke-width="8" stroke-linecap="round" />
+      <path d="M 0,60 L 0,120" stroke="url(#dataGradient)" stroke-width="8" stroke-linecap="round" />
+      
+      <!-- Puntos de datos en las líneas -->
+      <circle cx="-90" cy="0" r="10" fill="#ffffff" />
+      <circle cx="90" cy="0" r="10" fill="#ffffff" />
+      <circle cx="0" cy="-90" r="10" fill="#ffffff" />
+      <circle cx="0" cy="90" r="10" fill="#ffffff" />
+    </g>
+    
+    <!-- Elemento de crecimiento abstracto -->
+    <path d="M -40,-40 L 0,-80 L 40,-40 L 20,-40 L 20,40 L -20,40 L -20,-40 Z" 
+          fill="url(#growthGradient)" filter="url(#glow)" />
+  </g>
+  
+  <!-- Elementos de visualización de datos -->
+  <g transform="translate(256, 340)">
+    <!-- Barras de datos minimalistas -->
+    <rect x="-90" y="-20" width="20" height="40" rx="10" ry="10" fill="#ffffff" fill-opacity="0.8" />
+    <rect x="-50" y="-40" width="20" height="60" rx="10" ry="10" fill="#ffffff" fill-opacity="0.8" />
+    <rect x="-10" y="-60" width="20" height="80" rx="10" ry="10" fill="#ffffff" fill-opacity="0.8" />
+    <rect x="30" y="-30" width="20" height="50" rx="10" ry="10" fill="#ffffff" fill-opacity="0.8" />
+    <rect x="70" y="-50" width="20" height="70" rx="10" ry="10" fill="#ffffff" fill-opacity="0.8" />
+  </g>
+  
+  <!-- Elemento de texto minimalista -->
+  <g transform="translate(256, 180)" filter="url(#softShadow)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="70" font-weight="bold" text-anchor="middle" fill="#ffffff">SO</text>
+  </g>
+</svg>

@@ -1,0 +1,47 @@
+# Archivos y carpetas específicos de Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Archivos específicos de macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Archivos temporales
+*.tmp
+*.log
+*.bak
+*.swp
+
+# Archivos de configuración de IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Archivos de dependencias y módulos
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+package-lock.json
+
+# Archivos de compilación y distribución
+dist/
+build/
+*.min.js
+*.min.css
+
+# Archivos de entorno
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Archivos de caché
+.cache/
+.sass-cache/

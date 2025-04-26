@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Licencias - Sistema Objetivos</title>
+
+    <!-- Bootstrap CSS (local) -->
+    <link href="../lib/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome (local) -->
+    <link rel="stylesheet" href="../lib/css/fontawesome.min.css">
+
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="../css/styles.css">
+
+    <!-- Google Fonts (local) -->
+    <link rel="stylesheet" href="../lib/css/roboto.css">
+
+    <style>
+        .license-key-container {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .license-key {
+            font-family: monospace;
+            font-size: 1.2rem;
+            word-break: break-all;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background-color: #e9ecef;
+            border-radius: 0.25rem;
+        }
+
+        .license-details, .activation-details {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .license-result, .activation-result {
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .tab-content {
+            padding: 1.5rem;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            border-radius: 0 0 0.5rem 0.5rem;
+        }
+
+        .nav-tabs .nav-link {
+            font-weight: 500;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h5 {
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        /* Estilos para estadísticas de licencias */
+        .license-stats-container {
+            margin: 1.5rem 0;
+        }
+
+        .license-stat-card {
+            background-color: #f8f9fa;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            height: 100%;
+        }
+
+        .license-stat-title {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+
+        .license-stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        /* Estilos para acciones de licencias */
+        .license-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .license-filter {
+            width: 250px;
+        }
+
+        /* Estilos para tabla de licencias */
+        .license-table-container {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .license-status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .license-status-active {
+            background-color: #28a745;
+        }
+
+        .license-status-expired {
+            background-color: #dc3545;
+        }
+
+        .license-status-inactive {
+            background-color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mb-4">
+                    <i class="fas fa-key"></i> Generador de Licencias
+                    <a href="../index.html" class="btn btn-outline-secondary btn-sm float-end">
+                        <i class="fas fa-arrow-left"></i> Volver al Sistema
+                    </a>
+                </h2>
+
+                <div id="license-message" style="display: none;"></div>
+
+                <ul class="nav nav-tabs" id="licenseTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="generate-tab" data-bs-toggle="tab" data-bs-target="#generate" type="button" role="tab" aria-controls="generate" aria-selected="true">
+                            <i class="fas fa-plus-circle"></i> Generar Licencia
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="manage-tab" data-bs-toggle="tab" data-bs-target="#manage" type="button" role="tab" aria-controls="manage" aria-selected="false">
+                            <i class="fas fa-cogs"></i> Gestionar Licencias
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="licenseTabsContent">
+                    <!-- Pestaña de Generación de Licencias -->
+                    <div class="tab-pane fade show active" id="generate" role="tabpanel" aria-labelledby="generate-tab">
+                        <form id="license-generator-form">
+                            <div class="form-section">
+                                <h5>Información del Cliente</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="license-owner" class="form-label">Nombre del Cliente *</label>
+                                        <input type="text" class="form-control" id="license-owner" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="license-email" class="form-label">Email del Cliente *</label>
+                                        <input type="email" class="form-control" id="license-email" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h5>Configuración de Licencia</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="license-expiration" class="form-label">Días de Validez</label>
+                                        <input type="number" class="form-control" id="license-expiration" value="365" min="1">
+                                        <div class="form-text">Número de días que la licencia será válida desde su activación.</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="license-installations" class="form-label">Instalaciones Máximas</label>
+                                        <input type="number" class="form-control" id="license-installations" value="3" min="1">
+                                        <div class="form-text">Número máximo de dispositivos donde se puede activar esta licencia.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h5>Características Incluidas</h5>
+                                <div class="row">
+                                    <div class="col-md-4 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="dashboard" id="feature-dashboard" name="license-features" checked>
+                                            <label class="form-check-label" for="feature-dashboard">
+                                                Dashboard
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="objetivos" id="feature-objetivos" name="license-features" checked>
+                                            <label class="form-check-label" for="feature-objetivos">
+                                                Objetivos
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="creditos" id="feature-creditos" name="license-features" checked>
+                                            <label class="form-check-label" for="feature-creditos">
+                                                Créditos
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="admin" id="feature-admin" name="license-features" checked>
+                                            <label class="form-check-label" for="feature-admin">
+                                                Administración
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="updates" id="feature-updates" name="license-features" checked>
+                                            <label class="form-check-label" for="feature-updates">
+                                                Actualizaciones
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-key"></i> Generar Licencia
+                                </button>
+                            </div>
+                        </form>
+
+                        <div id="generated-license-display" style="display: none;"></div>
+                    </div>
+
+
+
+                    <!-- Pestaña de Gestión de Licencias -->
+                    <div class="tab-pane fade" id="manage" role="tabpanel" aria-labelledby="manage-tab">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Licencias Generadas</h5>
+                            <div class="license-actions">
+                                <button id="export-licenses-btn" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-file-export"></i> Exportar Licencias
+                                </button>
+                                <button id="import-licenses-btn" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-file-import"></i> Importar Licencias
+                                </button>
+                                <input type="file" id="import-licenses-file" accept=".json" style="display: none;">
+                            </div>
+                        </div>
+
+                        <div class="license-stats-container mb-4">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="license-stat-card">
+                                        <div class="license-stat-title">Total de Licencias</div>
+                                        <div class="license-stat-value" id="stat-total-licenses">-</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="license-stat-card">
+                                        <div class="license-stat-title">Licencias Activas</div>
+                                        <div class="license-stat-value" id="stat-active-licenses">-</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="license-stat-card">
+                                        <div class="license-stat-title">Licencias Expiradas</div>
+                                        <div class="license-stat-value" id="stat-expired-licenses">-</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="license-stat-card">
+                                        <div class="license-stat-title">Activaciones</div>
+                                        <div class="license-stat-value" id="stat-activations">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Listado de Licencias</h6>
+                                <div class="license-filter">
+                                    <input type="text" id="license-search" class="form-control form-control-sm" placeholder="Buscar licencia...">
+                                </div>
+                            </div>
+                            <div id="licenses-list">
+                                <div class="alert alert-info">
+                                    Cargando licencias...
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h5>Información de Licencia Actual</h5>
+                            <div id="current-license-info">
+                                <div class="alert alert-info">
+                                    Cargando información de licencia...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS (local) -->
+    <script src="../lib/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Scripts del sistema -->
+    <script src="../js/security.js"></script>
+    <script src="../js/simple-crypto.js"></script>
+    <script src="../js/license-storage.js"></script>
+    <script src="../js/license-backup.js"></script>
+    <script src="../js/license-generator.js"></script>
+
+    <!-- Inicializar módulos -->
+    <script>
+        // Inicializar módulos cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializar almacenamiento de licencias
+            if (window.LicenseStorage) {
+                LicenseStorage.init();
+            }
+
+            // Inicializar SimpleCrypto si está disponible
+            if (window.SimpleCrypto) {
+                console.log('SimpleCrypto disponible');
+            }
+        });
+    </script>
+
+    <script>
+        // Cargar lista de licencias generadas
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cargar lista de licencias cuando se haga clic en la pestaña de gestión
+            document.getElementById('manage-tab').addEventListener('click', loadLicensesList);
+
+            // La pestaña de activación de licencia ha sido eliminada
+            // Ya que no es compatible con la nueva configuración
+
+            // Cargar información de licencia actual
+            loadCurrentLicenseInfo();
+        });
+
+        // Cargar lista de licencias generadas
+        function loadLicensesList() {
+            const licensesList = document.getElementById('licenses-list');
+            if (!licensesList) return;
+
+            // Obtener licencias
+            let licenses = {};
+            let licenseKeys = [];
+
+            // Intentar obtener licencias del nuevo sistema
+            if (window.LicenseStorage) {
+                licenses = LicenseStorage.getLicenses();
+                licenseKeys = Object.keys(licenses);
+
+                // Actualizar estadísticas
+                updateLicenseStats();
+            } else {
+                // Método antiguo
+                licenses = JSON.parse(localStorage.getItem('generatedLicenses') || '{}');
+                licenseKeys = Object.keys(licenses);
+            }
+
+            if (licenseKeys.length === 0) {
+                licensesList.innerHTML = `
+                    <div class="alert alert-warning">
+                        No se han generado licencias aún.
+                    </div>
+                `;
+                return;
+            }
+
+            // Crear tabla de licencias
+            let html = `
+                <div class="license-table-container">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Estado</th>
+                                <th>Clave de Licencia</th>
+                                <th>Propietario</th>
+                                <th>Email</th>
+                                <th>Fecha de Creación</th>
+                                <th>Expiración</th>
+                                <th>Instalaciones</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="licenses-table-body">
+            `;
+
+            // Agregar filas de licencias
+            const currentDate = new Date();
+
+            licenseKeys.forEach(key => {
+                const license = licenses[key];
+
+                // Determinar estado de la licencia
+                let licenseStatus = 'inactive';
+                let statusTitle = 'Inactiva';
+
+                if (license.activations && license.activations.length > 0) {
+                    const firstActivation = new Date(license.activations[0].activationDate);
+                    const expirationDate = new Date(firstActivation.getTime() + (license.expirationDays || 365) * 24 * 60 * 60 * 1000);
+
+                    if (currentDate > expirationDate) {
+                        licenseStatus = 'expired';
+                        statusTitle = 'Expirada';
+                    } else {
+                        licenseStatus = 'active';
+                        statusTitle = 'Activa';
+                    }
+                }
+
+                html += `
+                    <tr data-license-key="${key}" data-license-owner="${license.owner}" data-license-email="${license.email}">
+                        <td><span class="license-status license-status-${licenseStatus}" title="${statusTitle}"></span></td>
+                        <td><code>${key.substring(0, 8)}...</code></td>
+                        <td>${license.owner}</td>
+                        <td>${license.email}</td>
+                        <td>${new Date(license.creationDate).toLocaleDateString()}</td>
+                        <td>${license.expirationDays} días</td>
+                        <td>${license.activations ? license.activations.length : 0}/${license.maxInstallations}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary view-license-btn" data-license="${key}" title="Ver detalles">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger delete-license-btn" data-license="${key}" title="Eliminar licencia">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            licensesList.innerHTML = html;
+
+            // Configurar botones de acción
+            const viewButtons = licensesList.querySelectorAll('.view-license-btn');
+            viewButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const licenseKey = btn.getAttribute('data-license');
+                    viewLicenseDetails(licenseKey);
+                });
+            });
+
+            const deleteButtons = licensesList.querySelectorAll('.delete-license-btn');
+            deleteButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const licenseKey = btn.getAttribute('data-license');
+                    deleteLicense(licenseKey);
+                });
+            });
+
+            // Configurar filtro de búsqueda
+            const searchInput = document.getElementById('license-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', filterLicenses);
+            }
+        }
+
+        // Filtrar licencias
+        function filterLicenses() {
+            const searchInput = document.getElementById('license-search');
+            const searchTerm = searchInput.value.toLowerCase();
+            const tableBody = document.getElementById('licenses-table-body');
+
+            if (!tableBody) return;
+
+            const rows = tableBody.querySelectorAll('tr');
+
+            rows.forEach(row => {
+                const licenseKey = row.getAttribute('data-license-key') || '';
+                const owner = row.getAttribute('data-license-owner') || '';
+                const email = row.getAttribute('data-license-email') || '';
+
+                const matchesSearch =
+                    licenseKey.toLowerCase().includes(searchTerm) ||
+                    owner.toLowerCase().includes(searchTerm) ||
+                    email.toLowerCase().includes(searchTerm);
+
+                row.style.display = matchesSearch ? '' : 'none';
+            });
+        }
+
+        // Actualizar estadísticas de licencias
+        function updateLicenseStats() {
+            if (!window.LicenseStorage) return;
+
+            const stats = LicenseStorage.getLicenseStats();
+
+            if (!stats) return;
+
+            // Actualizar valores en la interfaz
+            document.getElementById('stat-total-licenses').textContent = stats.total;
+            document.getElementById('stat-active-licenses').textContent = stats.active;
+            document.getElementById('stat-expired-licenses').textContent = stats.expired;
+            document.getElementById('stat-activations').textContent = `${stats.activations}/${stats.maxActivations}`;
+        }
+
+        // Ver detalles de licencia
+        function viewLicenseDetails(licenseKey) {
+            // Obtener licencia
+            let license;
+
+            // Intentar obtener con el nuevo sistema
+            if (window.LicenseStorage) {
+                license = LicenseStorage.getLicense(licenseKey);
+
+                if (license) {
+                    console.log('Licencia obtenida con el nuevo sistema:', licenseKey);
+                } else {
+                    console.error('No se encontró la licencia con el nuevo sistema');
+                }
+            }
+
+            // Si no se pudo obtener con el nuevo sistema, usar el método antiguo
+            if (!license) {
+                try {
+                    // Obtener licencias del localStorage
+                    const licenses = JSON.parse(localStorage.getItem('generatedLicenses') || '{}');
+                    license = licenses[licenseKey];
+
+                    if (license) {
+                        console.log('Licencia obtenida con el sistema antiguo:', licenseKey);
+                    }
+                } catch (error) {
+                    console.error('Error al obtener licencia con el sistema antiguo:', error);
+                }
+            }
+
+            if (!license) {
+                alert('No se encontró la licencia especificada.');
+                return;
+            }
+
+            // Crear modal para mostrar detalles
+            const modal = document.createElement('div');
+            modal.className = 'modal fade';
+            modal.id = 'licenseDetailsModal';
+            modal.setAttribute('tabindex', '-1');
+            modal.setAttribute('aria-labelledby', 'licenseDetailsModalLabel');
+            modal.setAttribute('aria-hidden', 'true');
+
+            modal.innerHTML = `
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="licenseDetailsModalLabel">Detalles de Licencia</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="license-key-container">
+                                <p><strong>Clave de Licencia:</strong></p>
+                                <div class="license-key">${licenseKey}</div>
+                                <button class="btn btn-sm btn-outline-primary copy-license-btn" data-license="${licenseKey}">
+                                    <i class="fas fa-copy"></i> Copiar
+                                </button>
+                            </div>
+
+                            <div class="license-details">
+                                <p><strong>Propietario:</strong> ${license.owner}</p>
+                                <p><strong>Email:</strong> ${license.email}</p>
+                                <p><strong>Fecha de Creación:</strong> ${new Date(license.creationDate).toLocaleDateString()}</p>
+                                <p><strong>Expiración:</strong> ${license.expirationDays} días</p>
+                                <p><strong>Instalaciones Máximas:</strong> ${license.maxInstallations}</p>
+                                <p><strong>Características:</strong> ${license.features.join(', ')}</p>
+                            </div>
+
+                            <h6 class="mt-4">Activaciones (${license.activations ? license.activations.length : 0}/${license.maxInstallations})</h6>
+                            ${renderActivationsList(license.activations)}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="button" class="btn btn-primary download-license-btn" data-license="${licenseKey}">
+                                <i class="fas fa-download"></i> Descargar Archivo de Licencia
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // Mostrar modal
+            const modalInstance = new bootstrap.Modal(modal);
+            modalInstance.show();
+
+            // Configurar botón de copia
+            const copyBtn = modal.querySelector('.copy-license-btn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', () => {
+                    copyToClipboard(licenseKey);
+                    alert('Clave de licencia copiada al portapapeles');
+                });
+            }
+
+            // Configurar botón de descarga
+            const downloadBtn = modal.querySelector('.download-license-btn');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', () => {
+                    downloadLicenseFile(licenseKey, license);
+                });
+            }
+
+            // Eliminar modal del DOM cuando se cierre
+            modal.addEventListener('hidden.bs.modal', () => {
+                document.body.removeChild(modal);
+            });
+        }
+
+        // Renderizar lista de activaciones
+        function renderActivationsList(activations) {
+            if (!activations || activations.length === 0) {
+                return `
+                    <div class="alert alert-info">
+                        Esta licencia no ha sido activada en ningún dispositivo.
+                    </div>
+                `;
+            }
+
+            let html = `
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Fecha de Activación</th>
+                                <th>ID de Instalación</th>
+                                <th>Dominio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            activations.forEach(activation => {
+                html += `
+                    <tr>
+                        <td>${new Date(activation.activationDate).toLocaleString()}</td>
+                        <td><code>${activation.installationId.substring(0, 8)}...</code></td>
+                        <td>${activation.domain}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            return html;
+        }
+
+        // Eliminar licencia
+        function deleteLicense(licenseKey) {
+            if (!confirm('¿Está seguro de que desea eliminar esta licencia? Esta acción no se puede deshacer.')) {
+                return;
+            }
+
+            let success = false;
+
+            // Intentar eliminar con el nuevo sistema
+            if (window.LicenseStorage) {
+                success = LicenseStorage.deleteLicense(licenseKey);
+
+                if (success) {
+                    console.log('Licencia eliminada con el nuevo sistema:', licenseKey);
+                } else {
+                    console.error('Error al eliminar licencia con el nuevo sistema');
+                }
+            }
+
+            // Si no se pudo eliminar con el nuevo sistema, usar el método antiguo
+            if (!success) {
+                try {
+                    // Obtener licencias del localStorage
+                    const licenses = JSON.parse(localStorage.getItem('generatedLicenses') || '{}');
+
+                    // Eliminar licencia
+                    delete licenses[licenseKey];
+
+                    // Guardar cambios
+                    localStorage.setItem('generatedLicenses', JSON.stringify(licenses));
+
+                    console.log('Licencia eliminada con el sistema antiguo:', licenseKey);
+                    success = true;
+                } catch (error) {
+                    console.error('Error al eliminar licencia con el sistema antiguo:', error);
+                }
+            }
+
+            if (success) {
+                // Mostrar mensaje de éxito
+                const messageContainer = document.getElementById('license-message');
+                if (messageContainer) {
+                    messageContainer.innerHTML = `
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            Licencia eliminada correctamente.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `;
+                    messageContainer.style.display = 'block';
+                } else {
+                    // Fallback a alert si no existe el contenedor
+                    alert('Licencia eliminada correctamente.');
+                }
+            }
+
+            // Recargar lista
+            loadLicensesList();
+        }
+
+        // Copiar texto al portapapeles
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+
+        // Descargar archivo de licencia
+        function downloadLicenseFile(licenseKey, licenseData) {
+            // Crear objeto con datos de licencia
+            const licenseFileData = {
+                licenseKey: licenseKey,
+                licenseData: licenseData
+            };
+
+            // Convertir a JSON
+            const licenseJson = JSON.stringify(licenseFileData, null, 2);
+
+            // Crear blob
+            const blob = new Blob([licenseJson], { type: 'application/json' });
+
+            // Crear URL
+            const url = URL.createObjectURL(blob);
+
+            // Crear enlace de descarga
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `licencia_${licenseData.owner.replace(/\s+/g, '_')}.json`;
+
+            // Simular clic
+            document.body.appendChild(a);
+            a.click();
+
+            // Limpiar
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 0);
+        }
+
+        // La función handleLicenseFileUpload ha sido eliminada
+        // ya que la pestaña de activación de licencia ha sido eliminada
+
+        // Cargar información de licencia actual
+        function loadCurrentLicenseInfo() {
+            const licenseInfo = document.getElementById('current-license-info');
+            if (!licenseInfo) return;
+
+            // Obtener licencia actual
+            const licenseKey = localStorage.getItem('licenseKey');
+            const licenseData = localStorage.getItem('licenseData');
+
+            if (!licenseKey || !licenseData) {
+                licenseInfo.innerHTML = `
+                    <div class="alert alert-warning">
+                        No hay ninguna licencia activada en este dispositivo.
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                // Desencriptar datos de licencia
+                let decryptedData;
+                try {
+                    decryptedData = Security.decrypt(licenseData);
+                } catch (e) {
+                    console.error('Error al desencriptar datos de licencia:', e);
+                    // Si hay un error al desencriptar, mostrar información básica
+                    licenseInfo.innerHTML = `
+                        <div class="alert alert-info">
+                            <h6>Información de Licencia</h6>
+                            <p><strong>Clave de Licencia:</strong> <code>${licenseKey ? licenseKey.substring(0, 8) + '...' : 'No disponible'}</code></p>
+                            <p><strong>Estado:</strong> <span class="badge bg-success">Activa</span></p>
+                            <p><small>Nota: Algunos detalles de la licencia no están disponibles en la versión portátil.</small></p>
+                            <button class="btn btn-sm btn-danger" onclick="deactivateLicense()">
+                                <i class="fas fa-times-circle"></i> Desactivar Licencia
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                if (!decryptedData) {
+                    throw new Error('No se pudieron desencriptar los datos de licencia.');
+                }
+
+                const license = JSON.parse(decryptedData);
+
+                // Calcular fecha de expiración
+                const activationDate = new Date(license.activationDate);
+                const expirationDate = new Date(activationDate.getTime() + (license.expirationDays || 365) * 24 * 60 * 60 * 1000);
+
+                // Calcular días restantes
+                const now = new Date();
+                const daysLeft = Math.ceil((expirationDate - now) / (24 * 60 * 60 * 1000));
+
+                // Mostrar información
+                licenseInfo.innerHTML = `
+                    <div class="license-details">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Propietario:</strong> ${license.owner}</p>
+                                <p><strong>Email:</strong> ${license.email}</p>
+                                <p><strong>Fecha de Activación:</strong> ${activationDate.toLocaleDateString()}</p>
+                                <p><strong>Fecha de Expiración:</strong> ${expirationDate.toLocaleDateString()}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Días Restantes:</strong> <span class="${daysLeft < 30 ? 'text-danger' : ''}">${daysLeft} días</span></p>
+                                <p><strong>ID de Instalación:</strong> <code>${license.installationId ? license.installationId.substring(0, 8) + '...' : 'No disponible'}</code></p>
+                                <p><strong>ID de Hardware:</strong> <code>${license.hardwareId ? license.hardwareId.substring(0, 8) + '...' : 'No disponible'}</code></p>
+                                <p><strong>Características:</strong> ${license.features ? license.features.join(', ') : 'Todas'}</p>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                            <button class="btn btn-danger" id="deactivate-license-btn">
+                                <i class="fas fa-times-circle"></i> Desactivar Licencia
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                // Configurar botón de desactivación
+                const deactivateBtn = document.getElementById('deactivate-license-btn');
+                if (deactivateBtn) {
+                    deactivateBtn.addEventListener('click', deactivateLicense);
+                }
+            } catch (error) {
+                console.error('Error al cargar información de licencia:', error);
+                licenseInfo.innerHTML = `
+                    <div class="alert alert-danger">
+                        Error al cargar información de licencia: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Desactivar licencia
+        function deactivateLicense() {
+            if (!confirm('¿Está seguro de que desea desactivar la licencia en este dispositivo? Necesitará activarla nuevamente para usar el sistema.')) {
+                return;
+            }
+
+            // Eliminar datos de licencia
+            localStorage.removeItem('licenseKey');
+            localStorage.removeItem('licenseData');
+            localStorage.removeItem('hardwareId');
+
+            // Recargar página
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
